@@ -13,7 +13,9 @@
 function get_record_count {
 	if [ -f ${archive}/Audience_DLAR_${1}*_1.csv ]
 	then
-		echo $(awk 'END {print NR}' ${archive}/Audience_DLAR_${1}*)
+		filecount=$(ls ${archive}/Audience_DLAR_${1}* | wc -l | awk '{print $1}')
+		total_record_count=$(awk 'END {print NR}' ${archive}/Audience_DLAR_${1}*)
+		echo $(($total_record_count - $filecount))
 	else
 		echo 0
 	fi
@@ -24,8 +26,10 @@ function get_record_count {
 function get_file_record_counts {
 	record_count_first_date=$(get_record_count $first_date)
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - $record_count_first_date records in the files from ${first_date_formatted}"
+	echo "$(date "+%Y-%m-%d %H:%M:%S") - $record_count_first_date records in the files from ${first_date_formatted}" >> $experian_report_file
 	record_count_second_date=$(get_record_count $second_date)
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - $record_count_second_date records in the files from ${second_date_formatted}"
+	echo "$(date "+%Y-%m-%d %H:%M:%S") - $record_count_second_date records in the files from ${second_date_formatted}" >> $experian_report_file
 	percentage_change=$(check_percentage_change_in_files $record_count_first_date $record_count_second_date)
 	if [[ $debug == 1 ]]
 	then
@@ -36,11 +40,11 @@ function get_file_record_counts {
 	# If we need to worry the experian_file_check_status flag wil be set here
 	#
 	worried=$(do_we_need_to_worry $percentage_change_whole_number)
-	echo "Record Count $first_date_formatted	Record Count $second_date_formatted" >> $experian_report_file
-	echo "===============================================" >> $experian_report_file
-	echo "$record_count_first_date			$record_count_second_date" >> $experian_report_file
-	echo "" >> $experian_report_file
-	echo "Percentage change = $percentage_change" >> $experian_report_file
+#	echo "Record Count $first_date_formatted	Record Count $second_date_formatted" >> $experian_report_file
+#	echo "===============================================" >> $experian_report_file
+#	echo "$record_count_first_date			$record_count_second_date" >> $experian_report_file
+#	echo "" >> $experian_report_file
+#	echo "Percentage change = $percentage_change" >> $experian_report_file
 	if [[ $worried == 1 ]]
 	then
 		echo "Record Count $first_date_formatted	Record Count $second_date_formatted" >> $experian_error_file
@@ -68,8 +72,10 @@ function count_files {
 function get_number_of_files_counts {
 	file_count_first_date=$(count_files $first_date)
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - $file_count_first_date files delivered on $first_date_formatted"
+	echo "$(date "+%Y-%m-%d %H:%M:%S") - $file_count_first_date files delivered on $first_date_formatted" >> $experian_report_file
 	file_count_second_date=$(count_files $second_date)
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - $file_count_second_date files delivered on $second_date_formatted"
+	echo "$(date "+%Y-%m-%d %H:%M:%S") - $file_count_second_date files delivered on $second_date_formatted" >> $experian_report_file
 	percentage_change=$(check_percentage_change_in_files $file_count_first_date $file_count_second_date)
 	percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
 	
@@ -77,11 +83,11 @@ function get_number_of_files_counts {
 	# If we need to worry the experian_file_check_status flag wil be set here
 	#
 	worried=$(do_we_need_to_worry $percentage_change_whole_number)
-	echo "File Count $first_date_formatted	File Count $second_date_formatted" >> $experian_report_file
-	echo "=============================================" >> $experian_report_file
-	echo "$file_count_first_date			$file_count_second_date" >> $experian_report_file
-	echo "" >> $experian_report_file
-	echo "Percentage change = $percentage_change" >> $experian_report_file
+#	echo "File Count $first_date_formatted	File Count $second_date_formatted" >> $experian_report_file
+#	echo "=============================================" >> $experian_report_file
+#	echo "$file_count_first_date			$file_count_second_date" >> $experian_report_file
+#	echo "" >> $experian_report_file
+#	echo "Percentage change = $percentage_change" >> $experian_report_file
 	if [[ $worried == 1 ]]
 	then
 		echo "File Count $first_date_formatted	File Count $second_date_formatted" >> $experian_error_file
@@ -115,6 +121,6 @@ function experian_file_checks {
 	# a sensible number of files delivered, or not.
 	echo "Counted Value","$first_date_formatted","$second_date_formatted","Percentage Change" > $experian_file_report_csv
 	get_file_record_counts $first_date $second_date
-#	get_number_of_files_counts $first_date $second_date
+	get_number_of_files_counts $first_date $second_date
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - Audience file consistency check finished"
 }

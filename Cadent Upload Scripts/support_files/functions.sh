@@ -33,7 +33,7 @@ function check_folder_structure {
 
 # Check to see if we have a lock file
 function check_for_lock {
-	if [[ -f $lock_file ]]
+	if [[ -f ${1}_${lock_file} ]]
 	then
 		echo 1
 	else
@@ -46,14 +46,14 @@ function create_lock_file {
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - Creating lock file"
 	if [[ ! -f $lock_file ]]
 	then
-		touch $lock_file
+		touch ${1}_${lock_file}
 	fi
 }
 
 # Remove the lock file
 function remove_lock_file {
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing lock file"
-	rm -f $lock_file
+	rm -f ${1}_${lock_file}
 }
 
 function check_inbox {
@@ -134,6 +134,8 @@ function send_message {
 		fi
 		
 	fi
+
+	tidy_up
 }
 
 function send_mail {
@@ -336,11 +338,11 @@ function check_outbox_consistency {
 		if [[ $check_textfile_status == 0 ]]
 		then
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - ${text_file} is found!"
-			echo "Supporting ${text_file} file has been found" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Supporting ${text_file} file has been found" >> $experian_report_file
 		else
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - ${text_file} is not found!"
-			echo "Supporting ${text_file} file has not been found" >> $experian_report_file
-			echo "Supporting ${text_file} file has not been found" >> $experian_error_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Supporting ${text_file} file has not been found" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Supporting ${text_file} file has not been found" >> $experian_error_file
 			return
 		fi
 
@@ -349,11 +351,11 @@ function check_outbox_consistency {
 		if [[ $count_lines_in_files_status == 1 ]]
 		then
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - $(basename $donefile .done).txt and $text_file contain a different number of lines"
-			echo "$(basename $donefile .done).txt and $text_file contain a different number of lines - bad" >> $experian_report_file
-			echo "$(basename $donefile .done).txt and $text_file contain a different number of lines - bad" >> $experian_error_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - $(basename $donefile .done).txt and $text_file contain a different number of lines - bad" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - $(basename $donefile .done).txt and $text_file contain a different number of lines - bad" >> $experian_error_file
 		else
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - $(basename $donefile .done).txt and $text_file contain the same number of lines"
-			echo "$(basename $donefile .done).txt and $text_file contain the same number of lines - good" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - $(basename $donefile .done).txt and $text_file contain the same number of lines - good" >> $experian_report_file
 		fi
 
 		# Check the date of the files to make sure we're using today's files
@@ -361,12 +363,12 @@ function check_outbox_consistency {
 		if [[ $check_textfile_date == 1 ]]
 		then
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - ${text_file} is old!"
-			echo "$text_file does not contain files for today - bad" >> $experian_report_file
-			echo "$text_file does not contain files for today - bad" >> $experian_error_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - $text_file does not contain files for today - bad" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - $text_file does not contain files for today - bad" >> $experian_error_file
 			return
 		else
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - ${text_file} is current!"
-			echo "$text_file contains files for today - good" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - $text_file contains files for today - good" >> $experian_report_file
 		fi
 
 		# Check the dates on the files in the inbox
@@ -374,12 +376,12 @@ function check_outbox_consistency {
 		if [[ $check_file_dates_status == 1 ]]
 		then
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - Files have bad dates"
-			echo "Supplied files are not dated today - bad" >> $experian_report_file
-			echo "Supplied files are not dated today - bad" >> $experian_error_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Supplied $3 files are not dated today - bad" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Supplied $3 files are not dated today - bad" >> $experian_error_file
 			return
 		else
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - Files have good dates"
-			echo "Supplied files are dated today - good" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Supplied $3 files are dated today - good" >> $experian_report_file
 		fi
 
 		# Check we have the files we're supposed to have
@@ -387,24 +389,24 @@ function check_outbox_consistency {
 		if [[ $check_files_exist_status == 1 ]]
 		then
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - Not all files are present"
-			echo "Not all stated files are present - bad" >> $experian_report_file
-			echo "Not all stated files are present - bad" >> $experian_error_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Not all stated $3 files are present - bad" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Not all stated $3 files are present - bad" >> $experian_error_file
 			returnn
 		else
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - All files appear to exist"
-			echo "All stated files are present - good" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - All stated $3 files are present - good" >> $experian_report_file
 		fi
 
 		# Now we check to see if the sizes supplied by match the actual filesizes for the siles
 		file_size_check_status=$(check_file_sizes $(basename $donefile .done).txt $2)
 		if [[ $file_size_check_status == 0 ]]
 		then
-			echo "$(date "+%Y-%m-%d %H:%M:%S") - All files appear to have the correct size"
-			echo "All files have the correct size - good" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - All $3 files appear to have the correct size"
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - All $3 files have the correct size - good" >> $experian_report_file
 		else
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - A file has the wrong size!"
-			echo "Not all files have the correct size - bad" >> $experian_report_file
-			echo "Not all files have the correct size - bad" >> $experian_error_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Not all $3 files have the correct size - bad" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Not all $3 files have the correct size - bad" >> $experian_error_file
 			return
 		fi
 
@@ -413,11 +415,11 @@ function check_outbox_consistency {
 		if [[ $check_file_type_status == 0 ]]
 		then
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - File types are good and convertable (if necessary)"
-			echo "All files are in the correct format or can be converted - good" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - All $3 files are in the correct format or can be converted - good" >> $experian_report_file
 		else
-			echo "$(date "+%Y-%m-%d %H:%M:%S") - A file has an unconvertable type!"
-			echo "Not all files are in the correct format or can be converted - bad" >> $experian_report_file
-			echo "Not all files are in the correct format or can be converted - bad" >> $experian_error_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - An $3 file has an unconvertable type!"
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Not all $3 files are in the correct format or can be converted - bad" >> $experian_report_file
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Not all $3 files are in the correct format or can be converted - bad" >> $experian_error_file
 			return
 		fi
 
@@ -439,9 +441,9 @@ function fail_files {
 	clean_inbox
 	remove_lock_file
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - Exiting"
-	echo "All done - exit" >> $experian_report_file
+	echo "$(date "+%Y-%m-%d %H:%M:%S") - All done - exit" >> $experian_report_file
 	send_message $1 $2 $3
-	exit 1
+	break
 }
 
 function clean_inbox {
@@ -517,11 +519,15 @@ function process_files {
     do
       file=$(echo $list | awk '{print $2}')
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Editing $file to remove to trailist data"
+      echo "$(date "+%Y-%m-%d %H:%M:%S") - Editing $file to remove to trailist data" >> $experian_report_file
       remove_trial_data $file $1
+      echo "$(date "+%Y-%m-%d %H:%M:%S") - Editing $file to remove to old boxes"
+      echo "$(date "+%Y-%m-%d %H:%M:%S") - Editing $file to remove to old boxes" >> $experian_report_file
       remove_delete_data $file $1
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Editing $file to remove Experian key (if present)"
+      echo "$(date "+%Y-%m-%d %H:%M:%S") - Editing $file to remove Experian key (if present)" >> $experian_report_file
       remove_experian_keys $file $1
-      echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting $file to proper enconding (if necessary)"
+      echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting $file to proper enconding (if necessary)" >> $experian_report_file
       utf_converter $file
     done < ${basefile}.txt
   elif [[ $1 == "Advt" ]]
@@ -530,6 +536,7 @@ function process_files {
     do
       file=$(echo $list | awk '{print $2}')
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting $file to proper enconding (if necessary)"
+      echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting $file to proper enconding (if necessary)" >> $experian_report_file
       utf_converter $file
     done < ${basefile}.txt
   fi
@@ -545,12 +552,14 @@ function create_delete {
   previous_filedate=$(ls -ltr ${sent}/Audience_DLAR*_1.csv 2> /dev/null | grep -v $today | awk '{print $9}' | cut -d_ -f3 | tail -1)
 
   cat Audience_DLAR_${current_filedate}*.csv | grep -v DEVICE | cut -d, -f2 | sort >> $working/${current_filedate}.txt
+  # We use sent rather than archive because sent is what was actually sent to Cadent so they're the ones we need to delete from
   cat ${sent}/Audience_DLAR_${previous_filedate}*.csv | grep -v DEVICE | cut -d, -f2 | sort >> $working/${previous_filedate}.txt
   diff -y ${working}/${current_filedate}.txt ${working}/${previous_filedate}.txt  | grep '<' | awk '{print $1}' >> $working/DLAR_${current_filedate}_delete.txt
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Delete list contains $(wc -l ${working}/DLAR_${current_filedate}_delete.txt | awk '{print $1}') records"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Delete list contains $(wc -l ${working}/DLAR_${current_filedate}_delete.txt | awk '{print $1}') records" >> $experian_report_file
 
-  rm ${working}/${current_filedate}.txt
-  rm ${working}/${previous_filedate}.txt
+#  rm ${working}/${current_filedate}.txt
+#  rm ${working}/${previous_filedate}.txt
 
   if [[ $(wc -l ${working}/DLAR_${current_filedate}_delete.txt | awk '{print $1}') -ge 1 ]]
   then
@@ -567,6 +576,7 @@ function create_delete {
     rm ${working}/DLAR_${current_filedate}_delete.csv
   else
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Delete file too small, not uploading to Cadent"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Delete file too small, not uploading to Cadent" >> $experian_report_file
   fi
 }
 
@@ -577,6 +587,7 @@ remove_trial_data() {
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Searching for trial boxes"
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing trialist data from Experian file $file"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing trialist data from Experian file $file" >> $experian_report_file
     grep -vf $support_files/MAC_list.txt $file > adjusted.tmp
     mv adjusted.tmp ${file}
   fi
@@ -589,6 +600,7 @@ remove_delete_data() {
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Searching for boxes to delete"
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing delete data from Experian file $file"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing delete data from Experian file $file" >> $experian_report_file
     grep -vf ${working}/delete.raw $file > adjusted.tmp
     mv adjusted.tmp ${file}
   fi
@@ -616,25 +628,33 @@ function utf_converter {
   if [[ "$filetype" =~ "UTF-8" ]]
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Filetype is UTF-8"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Filetype is UTF-8" >> $experian_report_file
     echo "$(date "+%Y-%m-%d %H:%M:%S") - No conversion necessary"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - No conversion necessary" >> $experian_report_file
   # This is what IT usually deliver the files as
   elif [[ "$filetype" == "ISO-8859" ]]
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Filetype is an ISO-8859 variant - using ISO-8859-1"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Filetype is an ISO-8859 variant - using ISO-8859-1" >> $experian_report_file
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting to UTF-8"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting to UTF-8" >> $experian_report_file
     iconv -f ISO-8859-1 -t UTF-8 $1 > output.txt
     mv output.txt $1
   # This is just a paranoia value
   elif [[ "$filetype" == "ASCII" ]]
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Filetype is ASCII"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Filetype is ASCII" >> $experian_report_file
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting to UTF-8"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting to UTF-8" >> $experian_report_file
     iconv -f ASCII -t UTF-8 $1 > output.txt
     mv output.txt $1
   elif [[ "$filetype" == "US-ASCII" ]]
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Filetype is US-ASCII"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Filetype is US-ASCII" >> $experian_report_file
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting to UTF-8"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Converting to UTF-8" >> $experian_report_file
     iconv -f US-ASCII -t UTF-8 $1 > output.txt
     mv output.txt $1
   fi
@@ -646,11 +666,11 @@ function check_delivery_ability_window {
 	if [[ $time_check_status == 0 ]]
  	then
         echo "$(date "+%Y-%m-%d %H:%M:%S") - Cadent can process these files today, continuing"
-        echo "Cadent can process these files today - sending to Cadent" >> $experian_report_file
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - Cadent can process these files today - sending to Cadent" >> $experian_report_file
     else
         echo "$(date "+%Y-%m-%d %H:%M:%S") - It's too late to send the files to Cadent as they will not be processed today"
-        echo "Cadent cannot process these files today - not sending" >> $experian_report_file
-        echo "Cadent cannot process these files today - not sending" >> $experian_error_file
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - Cadent cannot process these files today - not sending" >> $experian_report_file
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - Cadent cannot process these files today - not sending" >> $experian_error_file
     fi
 }
 
@@ -671,6 +691,7 @@ function time_check {
 # Random stuff can be sent by hand.
 function upload_files_to_cadent {
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - Time to send the files to Cadent"
+	echo "$(date "+%Y-%m-%d %H:%M:%S") - Time to send the files to Cadent" >> $experian_report_file
 	cd $outbox
 	if [[ $1 == "Audience" ]]
 	then
@@ -678,6 +699,7 @@ function upload_files_to_cadent {
 		# but now we have a delete file too
 		file=AUDIENCE_FILES.txt
 		echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading files from $file"
+		echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading files from $file" >> $experian_report_file
 		process_upload_file $file $1
 
 		if [[ -f DLAR_${today}_delete.csv ]]
@@ -692,11 +714,13 @@ function upload_files_to_cadent {
 		# For the opt-out files we only have the opt-out files. Nothing else should go
 		file=Advt_optout_devices.txt
 		echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading files from $file"
+		echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading files from $file" >> $experian_report_file
 		process_upload_file $file $1
 		archive_files $outbox $sent
 	else
 		echo "$(date "+%Y-%m-%d %H:%M:%S") - Something appears to have gone wrong"
 		echo "Failed to send Experian files to Cadent" >> $experian_report_file
+		echo "Failed to send Experian files to Cadent" >> $experian_error_file
 		echo "$(date "+%Y-%m-%d %H:%M:%S") - Exiting"
 #		check_upload_failure_status
 	fi
@@ -713,6 +737,7 @@ function process_upload_file {
 		cat $1 | while read list
 		do
 			echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading $list"
+			echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading $list" >> $experian_report_file
 			upload_to_cadent $list $2
 			if [[ $upload_fail_status == 1 ]]
 			then
@@ -726,6 +751,7 @@ function process_upload_file {
 	elif [[ "$1" == "DLAR_${today}_delete.csv" ]]
 	then
 		echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading delete file"
+		echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading delete file" >> $experian_report_file
 		upload_to_cadent DLAR_${today}_delete.csv
 	fi
 
@@ -795,6 +821,7 @@ function sftp_check {
 	else
 		upload_fail_status=0
 		echo "$(date "+%Y-%m-%d %H:%M:%S") - File sizes match, delivery was successful"
+		echo "$(date "+%Y-%m-%d %H:%M:%S") - File sizes match, delivery was successful" >> $experian_report_file
 	fi
 }
 
@@ -815,6 +842,6 @@ EOF
 
 function tidy_up {
 	cd $working
-	rm *.zip
-	mv * $reports
+	rm -f *.zip
+	rm -f *
 }

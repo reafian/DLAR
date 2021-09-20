@@ -91,6 +91,7 @@ function count_records {
 	done | sort -u | while read line
 	do
 		echo "$(date "+%Y-%m-%d %H:%M:%S") - Counting records in $line"
+		echo "$(date "+%Y-%m-%d %H:%M:%S") - Counting records in $line" >> $experian_report_file
 		count_today=$($sqlbin $sqldb "select count(\"$line\") from today")
 		count_yesterday=$($sqlbin $sqldb "select count(\"$line\") from yesterday")
 		percentage_change=$(check_percentage_change_in_files $count_today $count_yesterday)
@@ -99,16 +100,16 @@ function count_records {
 		# If we need to worry the experian_file_check_status flag wil be set here
 		#
 		worried=$(do_we_need_to_worry $percentage_change_whole_number)
-		echo "" >> $experian_report_file
-		printf "%-50s\n" $(echo "$line") >> $experian_report_file
-		printf "%50s\n" $(echo "--------------------------------------------------") >> $experian_report_file
-		printf "%-25s %-25s\n" $(echo "${first_date_formatted} ${second_date_formatted}") >> $experian_report_file
-		printf "%25s %25s\n" $(echo "=========================	=========================") >> $experian_report_file
-		printf "%25s %25s\n" $(echo "$count_today	$count_yesterday") >> $experian_report_file
-		echo "" >> $experian_report_file
-		echo "Percentage change = $percentage_change" >> $experian_report_file
-		echo "" >> $experian_report_file
-		echo "" >> $experian_report_file
+#		echo "" >> $experian_report_file
+#		printf "%-50s\n" $(echo "$line") >> $experian_report_file
+#		printf "%50s\n" $(echo "--------------------------------------------------") >> $experian_report_file
+#		printf "%-25s %-25s\n" $(echo "${first_date_formatted} ${second_date_formatted}") >> $experian_report_file
+#		printf "%25s %25s\n" $(echo "=========================	=========================") >> $experian_report_file
+#		printf "%25s %25s\n" $(echo "$count_today	$count_yesterday") >> $experian_report_file
+#		echo "" >> $experian_report_file
+#		echo "Percentage change = $percentage_change" >> $experian_report_file
+#		echo "" >> $experian_report_file
+#		echo "" >> $experian_report_file
 		if [[ $worried == 1 ]]
 		then
 			printf "%-50s\n" $(echo "$line") >> $experian_error_file
@@ -132,6 +133,7 @@ function count_headers {
 	done | sort -u | while read line
 	do     
     	echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking headers for $line"
+    	echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking headers for $line" >> $experian_report_file
     	result=$($sqlbin $sqldb "select distinct \"$line\", count(\"$line\") from today group by \"$line\"")
     	echo "$result" | while read result
     	do
@@ -142,17 +144,17 @@ function count_headers {
     		percentage_change=$(check_percentage_change_in_files $todays_value $yesterdays_value)
     		percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
     		worried=$(do_we_need_to_worry $percentage_change_whole_number)
-    		echo "" >> $experian_report_file
-    		printf "%-50s\n" $(echo "$line") >> $experian_report_file
-    		printf "%-50s\n" $(echo "$item") >> $experian_report_file
-			printf "%50s\n" $(echo "--------------------------------------------------") >> $experian_report_file
-			printf "%-25s %-25s\n" $(echo "${first_date_formatted} ${second_date_formatted}") >> $experian_report_file
-			printf "%25s %25s\n" $(echo "=========================	=========================") >> $experian_report_file
-			printf "%25s %25s\n" $(echo "$todays_value	$yesterdays_value") >> $experian_report_file
-			echo "" >> $experian_report_file
-			echo "Percentage change = $percentage_change" >> $experian_report_file
-			echo "" >> $experian_report_file
-			echo "" >> $experian_report_file
+#    		echo "" >> $experian_report_file
+#    		printf "%-50s\n" $(echo "$line") >> $experian_report_file
+#    		printf "%-50s\n" $(echo "$item") >> $experian_report_file
+#		printf "%50s\n" $(echo "--------------------------------------------------") >> $experian_report_file
+#		printf "%-25s %-25s\n" $(echo "${first_date_formatted} ${second_date_formatted}") >> $experian_report_file
+#		printf "%25s %25s\n" $(echo "=========================	=========================") >> $experian_report_file
+#		printf "%25s %25s\n" $(echo "$todays_value	$yesterdays_value") >> $experian_report_file
+#		echo "" >> $experian_report_file
+#		echo "Percentage change = $percentage_change" >> $experian_report_file
+#		echo "" >> $experian_report_file
+#		echo "" >> $experian_report_file
     		if [[ $worried == 1 ]]
     		then
     			echo "" >> $experian_report_file
@@ -188,8 +190,10 @@ function experian_data_checks {
 	first_date_formatted=$(unfix_date $1)
 	second_date_formatted=$(unfix_date $2)
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - Running checks on the Experian data"
+	echo "$(date "+%Y-%m-%d %H:%M:%S") - Running checks on the Experian data" >> $experian_report_file
 	import_sql_data
-	check_sql_data $1 $2
+	check_sql_data $first_date_formatted $second_date_formatted
 	echo "$(date "+%Y-%m-%d %H:%M:%S") - Finished checking the Experian data"
+	echo "$(date "+%Y-%m-%d %H:%M:%S") - Finished checking the Experian data" >> $experian_report_file
 	rm -f $sqldb
 }

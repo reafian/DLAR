@@ -64,10 +64,9 @@ else
   yesterday=$(date -d "1 day ago" +%Y%m%d)
   day_before_yesterday=$(date -d "2 day ago" +%Y%m%d)
   
-  home=/ulshome/etluser-adm/testing
-  experian_inbox=$home/dlar/inbox
-  #experian_inbox=/ulshome/etluser/dlar/inbox
-  optout_inbox=$home/dlar/optout/inbox
+  home=/ulshome/etluser-adm
+  experian_inbox=/ulshome/etluser/dlar/inbox
+  optout_inbox=/ulshome/etluser/dlar/optout/inbox
   outbox=$home/outbox
   archive=$home/archive
   reports=$home/reports
@@ -101,6 +100,5 @@ else
   # Mail
   reply_to=$(grep ^reply_to ${support_files}/user.ini | cut -d= -f2)
   send_to=$(grep ^send_to ${support_files}/user.ini | cut -d= -f2)
-#  send_to="skydlar@virginmedia.co.uk"
   failure_send_to=$(grep ^failure_send_to ${support_files}/user.ini | cut -d= -f2)
 fi
