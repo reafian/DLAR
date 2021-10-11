@@ -2,31 +2,40 @@
 
 # This script moves the Experian files to Cadent
 
+# Source files that provide the functionality we need (also keeps this file tidy)
+
 ################ DEBUG FLAG ################
 debug=0
 ############################################
 
 if [[ $(uname -a | awk '{print $1}') == "Darwin" ]]
 then
-  source_path=/Users/richard/Desktop/testing/scripts/support_files
+  source_path=/Users/richard/Desktop/scripts/support_files
 else
-  source_path=/ulshome/etluser-adm/testing/scripts/support_files
+  source_path=/ulshome/etluser-adm/scripts/support_files
+fi
+
+if [[ $debug == 1 ]]
+then
+  echo Using source path of $source_path
 fi
 
 source $source_path/variables.sh
 source $source_path/functions.sh
+source $source_path/optout_file_checks.sh
 source $source_path/experian_file_checks.sh
 source $source_path/experian_data_checks.sh
-source $source_path/optout_file_checks.sh
 
 check_folder_structure
-clear_working_folders
-
 
 # Check in inboxes for files and copy the files to the outbox for checking
 # Also copy the files to the archive so we know exactly what was received 
 for files in Optout Experian
 do
+
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" >> ${working}/${files}_$experian_report_file
+
   lock_status=$(check_for_lock $files)
   if [[ $lock_status == '1' ]]
   then
@@ -34,11 +43,8 @@ do
     exit 1
   fi
   echo "$(date "+%Y-%m-%d %H:%M:%S") - No lock file found, continuing"
-
   create_lock_file $files
 
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" >> $experian_report_file
 
   if [[ $files == Experian ]]
   then
@@ -50,23 +56,20 @@ do
     prefix="Advt"
   fi
 
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking inbox"
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking inbox" >> $experian_report_file
-  inbox_status=$(check_inbox $inbox $prefix $files)
-  if [[ $debug == 1 ]]
-  then
-    echo inbox status == $inbox_status
-  fi
+  prepare_outbox $prefix
 
-  if [[ $inbox_status != 1 ]]
+  check_inbox $inbox $prefix $files
+
+
+  if [[ $failure_status != 1 ]]
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - We appear to have valid inbox contents"
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - We appear to have valid inbox contents" >> $experian_report_file
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - We appear to have valid inbox contents" >> ${working}/${files}_$experian_report_file
     check_outbox_consistency $outbox $prefix $files
     check_error_failure_status $files delivery error
 
     echo "$(date "+%Y-%m-%d %H:%M:%S") - All files appear to have been delivered correctly"
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - All files appear to have been delivered correctly" >> $experian_report_file
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - All files appear to have been delivered correctly" >> ${working}/${files}_$experian_report_file
 
     # Now we check the files for deviation against the previous delivery
     if [[ $files == Experian ]]
@@ -79,7 +82,7 @@ do
       if [[ $previous != "" ]]
       then
         echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered Experian files"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered Experian files" >> $experian_report_file
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered Experian files" >> ${working}/${files}_$experian_report_file
         # AdOps don't need all these checks but there here for completeness. Check the experian_file_checks file to see what we're running.
         experian_file_checks $today $previous
         # If the number or data of the files received is wrong then we need to fail this
@@ -91,50 +94,39 @@ do
         check_error_failure_status $files data error
       else
         echo "$(date "+%Y-%m-%d %H:%M:%S") - We have no previous Experian files - skipping checks"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - We have no previous Experian files - skipping checks" >> $experian_report_file
       fi
     fi
 
     if [[ $files == Optout ]]
     then
-      if [[ $debug == 1 ]]
-      then
-        echo inbox status = $inbox_status
-      fi
-      previous=$(ls -ltr ${archive}/Advt*.csv 2> /dev/null | grep -v $today | awk '{print $9}' | cut -d_ -f4 | cut -c1-8)
+      previous=$(ls -ltr ${archive}/Advt*.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f4 | cut -c1-8)
       if [[ $previous != "" ]]
       then
         echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered Optout files"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered Optout files" >> $experian_report_file
-        optout_file_checks $today $previous
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered Optout files" >> ${working}/${files}_$experian_report_file
+        optout_file_checks $today $previous $files
         check_error_failure_status $files data error
       else
         echo "$(date "+%Y-%m-%d %H:%M:%S") - We have no previous optout files - skipping checks"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - We have no previous optout files - skipping checks" >> $experian_report_file
+        echo "$(date "+%Y-%m-%d %H:%M:%S") - We have no previous optout files - skipping checks" >> ${working}/${files}_$experian_report_file
       fi
     fi 
 
-    # Processing the files should be the last thing we do because this takes time.
-    # Here we remove the trialist data and change to the correct format (if that was necessary)
+   # Processing the files should be the last thing we do because this takes time.
+   # Here we remove the trialist data and change to the correct format (if that was necessary)
     process_files $prefix
 
-    # Paranoia check the delivery window again just in case the processing took too long
-    # This doesn't work with long running jobs but I don't want to delete it just yet
-    #check_delivery_ability_window
-    #check_error_failure_status $files time error
-
-    # Upload the files to Cadent
-#    upload_files_to_cadent $prefix
-#    check_error_failure_status $files cadent error
-
+   # Upload the files to Cadent
+    upload_files_to_cadent $prefix
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Processing of $files files complete"
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - Processing of $files files complete" >> $experian_report_file
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Processing of $files files complete" >> ${working}/${files}_$experian_report_file
+
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Sending mail"
     send_message $files $prefix
   fi
 
-
+  tidy_up $files
   remove_lock_file $files
 
 done
 
-tidy_up

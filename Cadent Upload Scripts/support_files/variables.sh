@@ -35,7 +35,7 @@ then
   scripts=${home}/scripts
   working=$scripts/.working
   support_files=$scripts/support_files
-  lock_file=$working/dlar_uploader.lock
+  lock_file=dlar_uploader.lock
   last_upload_time="19:30"
 
   # Cadent
@@ -49,12 +49,12 @@ then
   sqldb=$working/Experian.db
 
   # Reports
-  experian_report_file=$working/report.tmp
-  experian_record_counts_csv=$working/record_count_report.csv
-  experian_file_report_csv=$working/file_report.csv
-  experian_attr_report_csv=$working/attribute_count_report.csv
-  experian_attr_data_report_csv=$working/attribute_data_count_report.csv
-  experian_error_file=$working/error.tmp
+  experian_report_file=report.tmp
+  experian_record_counts_csv=record_count_report.csv
+  experian_file_report_csv=file_report.csv
+  experian_attr_report_csv=attribute_count_report.csv
+  experian_attr_data_report_csv=attribute_data_count_report.csv
+  experian_error_file=error.tmp
   experian_zip=experian_reports_${today}.zip
 else
   #
@@ -75,8 +75,8 @@ else
   scripts=$home/scripts
   working=$scripts/.working
   support_files=$scripts/support_files
-  lock_file=$working/dlar_uploader.lock
-  last_upload_time="14:20"
+  lock_file=dlar_uploader.lock
+  last_upload_time="15:00"
 
   # Cadent
   cadent_user=$(grep ^cadent_user ${support_files}/user.ini | cut -d= -f2)
@@ -89,12 +89,12 @@ else
   sqldb=$working/Experian.db
 
   # Reports
-  experian_report_file=$working/report.tmp
-  experian_record_counts_csv=$working/record_count_report.csv
-  experian_file_report_csv=$working/file_report.csv
-  experian_attr_report_csv=$working/attribute_count_report.csv
-  experian_attr_data_report_csv=$working/attribute_data_count_report.csv
-  experian_error_file=$working/error.tmp
+  experian_report_file=report.tmp
+  experian_record_counts_csv=record_count_report.csv
+  experian_file_report_csv=file_report.csv
+  experian_attr_report_csv=attribute_count_report.csv
+  experian_attr_data_report_csv=attribute_data_count_report.csv
+  experian_error_file=error.tmp
   experian_zip=experian_reports_${today}.zip
 
   # Mail
