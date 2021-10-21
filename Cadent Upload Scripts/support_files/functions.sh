@@ -40,17 +40,17 @@ function remove_lock_file {
 }
 
 function prepare_outbox {
-  if [[ $prefix == "Audience" ]]
+  if [[ $1 == "Audience" ]]
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing old Audience files"
-    rm -f ${outbox}/${prefix}*
+    rm -f ${outbox}/${1}*
     rm -f ${outbox}/AUDIENCE*
     rm -f ${outbox}/DLAR*
   fi
-  if [[ $prefix == "Advt" ]]
+  if [[ $1 == "Advt" ]]
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing old optout files"
-    rm -f ${outbox}/${prefix}*
+    rm -f ${outbox}/${1}*
   fi
 } 
 
@@ -435,19 +435,23 @@ function rename_reports {
   fi
   if [ -f ${working}/${files}_$experian_record_counts_csv ]
   then
-    cp ${working}/${files}_$experian_record_counts_csv $reports
+    cp ${working}/${files}_$experian_record_counts_csv ${reports}/${files}_${experian_record_counts_csv}_${today}.csv
+    mv ${working}/${files}_$experian_record_counts_csv ${files}_${experian_record_counts_csv}_${today}.csv
   fi
   if [ -f ${working}/${files}_$experian_file_report_csv ]
   then
-    cp ${working}/${files}_$experian_file_report_csv $reports
+    cp ${working}/${files}_$experian_file_report_csv ${reports}/${files}_${experian_file_report_csv}_${today}.csv
+    mv ${working}/${files}_$experian_file_report_csv ${files}_${experian_file_report_csv}_${today}.csv
   fi
   if [ -f ${working}/${files}_$experian_attr_report_csv ]
   then
-    cp ${working}/${files}_$experian_attr_report_csv $reports
+    cp ${working}/${files}_$experian_attr_report_csv ${reports}/${files}_${experian_attr_report_csv}_${today}.csv
+    mv ${working}/${files}_$experian_attr_report_csv ${files}_${experian_attr_report_csv}_${today}.csv
   fi
   if [ -f ${working}/${files}_$experian_attr_data_report_csv ]
   then
-    cp ${working}/${files}_$experian_attr_data_report_csv $reports
+    cp ${working}/${files}_$experian_attr_data_report_csv ${reports}/${files}_${experian_attr_data_report_csv}_${today}.csv
+    mv ${working}/${files}_$experian_attr_data_report_csv ${files}_${experian_attr_data_report_csv}_${today}.csv
   fi
 }
 
@@ -789,7 +793,20 @@ function process_upload_file {
       fi
     done
   else
-    archive_files $outbox $sent
+    if [[ $2 == "Audience" ]]
+    then
+      mv ${outbox}/Audience* $sent
+      mv ${outbox}/AUDIENCE_FILES.txt ${sent}AUDIENCE_FILES_${today}.txt
+    fi
+    if [[ $2 == "Advt" ]]
+    then
+      mv ${outbox}/Advt_optout_devices.txt ${sent}/Advt_optout_devices_${today}.txt
+      mv ${outbox}/Advt* $sent
+    fi
+    if [[ $1 == DLAR_${today}_delete.csv ]]
+    then
+      mv ${outbox}/DLAR_${today}_delete.csv $sent
+    fi
   fi
 }
 
@@ -814,7 +831,6 @@ function upload_files_to_cadent {
     then
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Delete file found - uploading"
       process_upload_file DLAR_${today}_delete.csv
-#      rm -f DLAR_${today}_delete.csv
     else
       echo "$(date "+%Y-%m-%d %H:%M:%S") - No delete file found"
     fi

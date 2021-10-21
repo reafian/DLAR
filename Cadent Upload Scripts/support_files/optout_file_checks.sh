@@ -26,17 +26,35 @@ function get_eos_record_count {
   fi
 }
 
+# Get a count of records in each file
+function get_apls_record_count {
+  if [ -f ${archive}/Advt_optout_devices_${1}*.csv ]
+  then
+    if [[ $3 == "optedin" ]]
+    then
+      count=$(grep $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"0"')
+      echo $count
+    elif [[ $3 == "optedout" ]]
+    then
+      count=$(grep $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"1"')
+      echo $count
+    fi
+  else
+    echo 0
+  fi
+}
+
 # TiVo is basically not EOS
 function get_tivo_record_count {
   if [ -f ${archive}/Advt_optout_devices_${1}*.csv ]
   then
     if [[ $3 == "optedin" ]]
     then
-      count=$(grep -v $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"0"')
+      count=$(egrep -v $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"0"')
       echo $count
     elif [[ $3 == "optedout" ]]
     then
-      count=$(grep -v $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"1"')
+      count=$(egrep -v $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"1"')
       echo $count
     fi
   else
@@ -83,8 +101,44 @@ function get_optout_file_record_counts {
     echo "" >> ${working}/${files}_$experian_error_file
   fi
 
-  tivo_optedin_first_date=$(get_tivo_record_count $first_date EOS optedin)
-  tivo_optedin_second_date=$(get_tivo_record_count $second_date EOS optedin)
+  apls_optedin_first_date=$(get_apls_record_count $first_date APLS optedin)
+  apls_optedin_second_date=$(get_apls_record_count $second_date APLS optedin)
+
+  percentage_change=$(check_percentage_change_in_files $apls_optedin_first_date $apls_optedin_second_date)
+  percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
+  echo "APLS Opted In","$apls_optedin_first_date","$apls_optedin_second_date","$percentage_change" >> ${working}/${files}_$experian_file_report_csv
+  worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
+
+  if [[ $worried == 1 ]]
+  then
+    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$experian_error_file
+    echo "===============================================" >> ${working}/${files}_$experian_error_file
+    echo "$apls_optedin_first_date      $apls_optedin_second_date" >> ${working}/${files}_$experian_error_file
+    echo "" >> ${working}/${files}_$experian_error_file
+    echo "Percentage change = $percentage_change" >> ${working}/${files}_$experian_error_file
+    echo "" >> ${working}/${files}_$experian_error_file
+  fi
+
+  apls_optedout_first_date=$(get_apls_record_count $first_date APLS optedout)
+  apls_optedout_second_date=$(get_apls_record_count $second_date APLS optedout)
+
+  percentage_change=$(check_percentage_change_in_files $apls_optedout_first_date $apls_optedout_second_date)
+  percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
+  echo "APLS Opted Out","$apls_optedout_first_date","$apls_optedout_second_date","$percentage_change" >> ${working}/${files}_$experian_file_report_csv
+  worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
+
+  if [[ $worried == 1 ]]
+  then
+    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$experian_error_file
+    echo "===============================================" >> ${working}/${files}_$experian_error_file
+    echo "$apls_optedout_first_date      $apls_optedout_second_date" >> ${working}/${files}_$experian_error_file
+    echo "" >> ${working}/${files}_$experian_error_file
+    echo "Percentage change = $percentage_change" >> ${working}/${files}_$experian_error_file
+    echo "" >> ${working}/${files}_$experian_error_file
+  fi
+
+  tivo_optedin_first_date=$(get_tivo_record_count $first_date "EOS|APLS" optedin)
+  tivo_optedin_second_date=$(get_tivo_record_count $second_date "EOS|APLS" optedin)
 
   percentage_change=$(check_percentage_change_in_files $tivo_optedin_first_date $tivo_optedin_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
@@ -101,8 +155,8 @@ function get_optout_file_record_counts {
     echo "" >> ${working}/${files}_$experian_error_file
   fi
 
-  tivo_optedout_first_date=$(get_tivo_record_count $first_date EOS optedout)
-  tivo_optedout_second_date=$(get_tivo_record_count $second_date EOS optedout)
+  tivo_optedout_first_date=$(get_tivo_record_count $first_date "EOS|APLS" optedout)
+  tivo_optedout_second_date=$(get_tivo_record_count $second_date "EOS|APLS" optedout)
 
   percentage_change=$(check_percentage_change_in_files $tivo_optedout_first_date $tivo_optedout_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')

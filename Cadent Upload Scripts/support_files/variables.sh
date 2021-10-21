@@ -6,6 +6,10 @@
 # Here we define all system variables we need for the script
 #
 
+# Change history
+# v01 - Richard Newton - original version
+#       variables file for v10 DLAR_uploader script
+
 # System independent Variables
 experian_file_check_status=0
 experian_data_check_status=0
@@ -50,10 +54,10 @@ then
 
   # Reports
   experian_report_file=report.tmp
-  experian_record_counts_csv=record_count_report.csv
-  experian_file_report_csv=file_report.csv
-  experian_attr_report_csv=attribute_count_report.csv
-  experian_attr_data_report_csv=attribute_data_count_report.csv
+  experian_record_counts_csv=record_count_report
+  experian_file_report_csv=file_report
+  experian_attr_report_csv=attribute_count_report
+  experian_attr_data_report_csv=attribute_data_count_report
   experian_error_file=error.tmp
   experian_zip=experian_reports_${today}.zip
 else
@@ -90,10 +94,10 @@ else
 
   # Reports
   experian_report_file=report.tmp
-  experian_record_counts_csv=record_count_report.csv
-  experian_file_report_csv=file_report.csv
-  experian_attr_report_csv=attribute_count_report.csv
-  experian_attr_data_report_csv=attribute_data_count_report.csv
+  experian_record_counts_csv=record_count_report
+  experian_file_report_csv=file_report
+  experian_attr_report_csv=attribute_count_report
+  experian_attr_data_report_csv=attribute_data_count_report
   experian_error_file=error.tmp
   experian_zip=experian_reports_${today}.zip
 

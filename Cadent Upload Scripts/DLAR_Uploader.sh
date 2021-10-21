@@ -2,6 +2,11 @@
 
 # This script moves the Experian files to Cadent
 
+# Change history
+#	adding in csv reporting for AdOps
+#	only mail if changes fall inside 40 - 99% changes
+#	added delete function to delete old DLAR boxes
+
 # Source files that provide the functionality we need (also keeps this file tidy)
 
 ################ DEBUG FLAG ################
@@ -33,9 +38,6 @@ check_folder_structure
 for files in Optout Experian
 do
 
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" >> ${working}/${files}_$experian_report_file
-
   lock_status=$(check_for_lock $files)
   if [[ $lock_status == '1' ]]
   then
@@ -45,6 +47,9 @@ do
   echo "$(date "+%Y-%m-%d %H:%M:%S") - No lock file found, continuing"
   create_lock_file $files
 
+
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" >> ${working}/${files}_$experian_report_file
 
   if [[ $files == Experian ]]
   then
