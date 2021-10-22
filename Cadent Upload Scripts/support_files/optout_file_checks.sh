@@ -70,17 +70,17 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $eos_optedin_first_date $eos_optedin_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "EOS Opted In","$eos_optedin_first_date","$eos_optedin_second_date","$percentage_change" >> ${working}/${files}_$experian_file_report_csv
+  echo "EOS Opted In","$eos_optedin_first_date","$eos_optedin_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
   then
-    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$experian_error_file
-    echo "===============================================" >> ${working}/${files}_$experian_error_file
-    echo "$eos_optedin_first_date      $eos_optedin_second_date" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
-    echo "Percentage change = $percentage_change" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
+    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$error_file
+    echo "===============================================" >> ${working}/${files}_$error_file
+    echo "$eos_optedin_first_date      $eos_optedin_second_date" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
+    echo "Percentage change = $percentage_change" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
   fi
 
   eos_optedout_first_date=$(get_eos_record_count $first_date EOS optedout)
@@ -88,17 +88,17 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $eos_optedout_first_date $eos_optedout_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "EOS Opted Out","$eos_optedout_first_date","$eos_optedout_second_date","$percentage_change" >> ${working}/${files}_$experian_file_report_csv
+  echo "EOS Opted Out","$eos_optedout_first_date","$eos_optedout_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
   then
-    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$experian_error_file
-    echo "===============================================" >> ${working}/${files}_$experian_error_file
-    echo "$eos_optedout_first_date      $eos_optedout_second_date" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
-    echo "Percentage change = $percentage_change" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
+    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$error_file
+    echo "===============================================" >> ${working}/${files}_$error_file
+    echo "$eos_optedout_first_date      $eos_optedout_second_date" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
+    echo "Percentage change = $percentage_change" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
   fi
 
   apls_optedin_first_date=$(get_apls_record_count $first_date APLS optedin)
@@ -106,17 +106,17 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $apls_optedin_first_date $apls_optedin_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "APLS Opted In","$apls_optedin_first_date","$apls_optedin_second_date","$percentage_change" >> ${working}/${files}_$experian_file_report_csv
+  echo "APLS Opted In","$apls_optedin_first_date","$apls_optedin_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
   then
-    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$experian_error_file
-    echo "===============================================" >> ${working}/${files}_$experian_error_file
-    echo "$apls_optedin_first_date      $apls_optedin_second_date" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
-    echo "Percentage change = $percentage_change" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
+    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$error_file
+    echo "===============================================" >> ${working}/${files}_$error_file
+    echo "$apls_optedin_first_date      $apls_optedin_second_date" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
+    echo "Percentage change = $percentage_change" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
   fi
 
   apls_optedout_first_date=$(get_apls_record_count $first_date APLS optedout)
@@ -124,17 +124,17 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $apls_optedout_first_date $apls_optedout_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "APLS Opted Out","$apls_optedout_first_date","$apls_optedout_second_date","$percentage_change" >> ${working}/${files}_$experian_file_report_csv
+  echo "APLS Opted Out","$apls_optedout_first_date","$apls_optedout_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
   then
-    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$experian_error_file
-    echo "===============================================" >> ${working}/${files}_$experian_error_file
-    echo "$apls_optedout_first_date      $apls_optedout_second_date" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
-    echo "Percentage change = $percentage_change" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
+    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$error_file
+    echo "===============================================" >> ${working}/${files}_$error_file
+    echo "$apls_optedout_first_date      $apls_optedout_second_date" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
+    echo "Percentage change = $percentage_change" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
   fi
 
   tivo_optedin_first_date=$(get_tivo_record_count $first_date "EOS|APLS" optedin)
@@ -142,17 +142,17 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $tivo_optedin_first_date $tivo_optedin_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "TiVo Opted In","$tivo_optedin_first_date","$tivo_optedin_second_date","$percentage_change" >> ${working}/${files}_$experian_file_report_csv
+  echo "TiVo Opted In","$tivo_optedin_first_date","$tivo_optedin_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
   then
-    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> $${working}/${files}_experian_error_file
-    echo "===============================================" >> ${working}/${files}_$experian_error_file
-    echo "$tivo_optedin_first_date      $tivo_optedin_second_date" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
-    echo "Percentage change = $percentage_change" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
+    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> $${working}/${files}_error_file
+    echo "===============================================" >> ${working}/${files}_$error_file
+    echo "$tivo_optedin_first_date      $tivo_optedin_second_date" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
+    echo "Percentage change = $percentage_change" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
   fi
 
   tivo_optedout_first_date=$(get_tivo_record_count $first_date "EOS|APLS" optedout)
@@ -160,34 +160,33 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $tivo_optedout_first_date $tivo_optedout_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "TiVo Opted Out","$tivo_optedout_first_date","$tivo_optedout_second_date","$percentage_change" >> ${working}/${files}_$experian_file_report_csv
+  echo "TiVo Opted Out","$tivo_optedout_first_date","$tivo_optedout_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
   then
-    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$experian_error_file
-    echo "===============================================" >> ${working}/${files}_$experian_error_file
-    echo "$tivo_optedout_first_date      $tivo_optedout_second_date" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
-    echo "Percentage change = $percentage_change" >> ${working}/${files}_$experian_error_file
-    echo "" >> ${working}/${files}_$experian_error_file
+    echo "Record Count $first_date_formatted  Record Count $second_date_formatted" >> ${working}/${files}_$error_file
+    echo "===============================================" >> ${working}/${files}_$error_file
+    echo "$tivo_optedout_first_date      $tivo_optedout_second_date" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
+    echo "Percentage change = $percentage_change" >> ${working}/${files}_$error_file
+    echo "" >> ${working}/${files}_$error_file
   fi
 
 }
 
 # Run the checks on today's file and the previously delivered file.
 function optout_file_checks {
-first_date=$1
-second_date=$2
-files=$3 
-first_date_formatted=$(unfix_date $1)
-second_date_formatted=$(unfix_date $2)
-echo "$(date "+%Y-%m-%d %H:%M:%S") - Check Optout files for consistency"
-echo "$(date "+%Y-%m-%d %H:%M:%S") - Check Optout files for consistency" >> ${working}/${files}_$experian_report_file
-# Experian will do pretty much all the data checks. We're just checking to see if we have
-# a sensible number of files delivered, or not.
-echo "Counted Value","$first_date_formatted","$second_date_formatted","Percentage Change" > ${working}/${files}_$experian_file_report_csv
-get_optout_file_record_counts $first_date $second_date
-echo "$(date "+%Y-%m-%d %H:%M:%S") - Optout file consistency check finished"
-echo "$(date "+%Y-%m-%d %H:%M:%S") - Optout file consistency check finished" >> ${working}/${files}_$experian_report_file
+  first_date=$1
+  second_date=$2
+  first_date_formatted=$(unfix_date $1)
+  second_date_formatted=$(unfix_date $2)
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Check Optout files for consistency"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Check Optout files for consistency" >> ${working}/${files}_$report_file
+  # Experian will do pretty much all the data checks. We're just checking to see if we have
+  # a sensible number of files delivered, or not.
+  echo "Counted Value","$first_date_formatted","$second_date_formatted","Percentage Change" > ${working}/${files}_$file_report_csv
+  get_optout_file_record_counts $first_date $second_date
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Optout file consistency check finished"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Optout file consistency check finished" >> ${working}/${files}_$report_file
 }

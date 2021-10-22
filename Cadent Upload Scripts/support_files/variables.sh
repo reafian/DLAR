@@ -28,7 +28,7 @@ then
   yesterday=$(date -v-1d +%Y%m%d)
   day_before_yesterday=$(date -v-2d +%Y%m%d)
 
-  home=~/Desktop/testing
+  home=${HOME}/Desktop/dlar
   experian_inbox=${home}/dlar/inbox
   optout_inbox=${home}/dlar/optout/inbox
   outbox=${home}/outbox
@@ -40,7 +40,6 @@ then
   working=$scripts/.working
   support_files=$scripts/support_files
   lock_file=dlar_uploader.lock
-  last_upload_time="19:30"
 
   # Cadent
   cadent_user=$(grep ^cadent_user ${support_files}/user.ini | cut -d= -f2)
@@ -53,13 +52,13 @@ then
   sqldb=$working/Experian.db
 
   # Reports
-  experian_report_file=report.tmp
+  report_file=report.tmp
   experian_record_counts_csv=record_count_report
-  experian_file_report_csv=file_report
+  file_report_csv=file_report
   experian_attr_report_csv=attribute_count_report
   experian_attr_data_report_csv=attribute_data_count_report
-  experian_error_file=error.tmp
-  experian_zip=experian_reports_${today}.zip
+  error_file=error.tmp
+  experian_zip=reports_${today}.zip
 else
   #
   # Actual proper ULS values
@@ -68,7 +67,7 @@ else
   yesterday=$(date -d "1 day ago" +%Y%m%d)
   day_before_yesterday=$(date -d "2 day ago" +%Y%m%d)
   
-  home=/ulshome/etluser-adm
+  home=$HOME
   experian_inbox=/ulshome/etluser/dlar/inbox
   optout_inbox=/ulshome/etluser/dlar/optout/inbox
   outbox=$home/outbox
@@ -80,7 +79,6 @@ else
   working=$scripts/.working
   support_files=$scripts/support_files
   lock_file=dlar_uploader.lock
-  last_upload_time="15:00"
 
   # Cadent
   cadent_user=$(grep ^cadent_user ${support_files}/user.ini | cut -d= -f2)
@@ -93,13 +91,13 @@ else
   sqldb=$working/Experian.db
 
   # Reports
-  experian_report_file=report.tmp
+  report_file=report.tmp
   experian_record_counts_csv=record_count_report
-  experian_file_report_csv=file_report
+  file_report_csv=file_report
   experian_attr_report_csv=attribute_count_report
   experian_attr_data_report_csv=attribute_data_count_report
-  experian_error_file=error.tmp
-  experian_zip=experian_reports_${today}.zip
+  error_file=error.tmp
+  experian_zip=reports_${today}.zip
 
   # Mail
   reply_to=$(grep ^reply_to ${support_files}/user.ini | cut -d= -f2)
