@@ -22,10 +22,10 @@ optout=0
 experian=1
 optout_checks=1
 process_files=1
-create_delete=0
+create_delete=1
 experian_file_checks=0
 experian_data_checks=0
-upload_to_cadent=0
+upload_to_cadent=1
 send_mail=0
 
 source $source_path/variables.sh
@@ -60,54 +60,48 @@ then
     
   lock_status=$(check_for_lock $files)
   
-  if [[ $lock_status == '1' ]]
+  if [[ $lock_status != '1' ]]
   then
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - Lock file found, exiting"
-    continue
-  fi
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - No lock file found, continuing"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - No lock file found, continuing"
+    create_lock_file $files
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" > ${working}/${files}_$report_file
 
-  create_lock_file $files
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" > ${working}/${files}_$report_file
+    if [[ $files == Optout ]]
+    then
+      prepare_outbox $prefix $files
+      check_inbox $inbox $prefix $files
 
-  if [[ $files == Optout ]]
-  then
-
-    prepare_outbox $prefix $files
-    check_inbox $inbox $prefix $files 
-
-    if [[ $failure_status != 1 ]]
-    then 
-
-      previous=$(ls -ltr ${sent}/Advt*.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f4 | cut -c1-8)
-      if [[ $previous != "" ]] && [[ $optout_checks == 1 ]]
+      if [[ $failure_status != 1 ]]
       then
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files" >> ${working}/${files}_$report_file
-
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Today = $today"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Previous = $previous"
-        optout_file_checks $today $previous $files
-      else
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Skipping $files checks"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Skipping $files checks" >> ${working}/${files}_$report_file
-      fi
-
-      # If we have an error file there's no point sending the files to Cadent
-      if [ -f ${working}/${files}_$error_file ]
-      then
-        archive_files $files $outbox $failed
-      else
-        # Upload the files to Cadent
-        if [[ $upload_to_cadent == 1 ]]
+        previous=$(ls -ltr ${sent}/Advt*.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f4 | cut -c1-8)
+        if [[ $previous != "" ]] && [[ $optout_checks == 1 ]]
         then
-          upload_files_to_cadent $prefix $files
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files"
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files" >> ${working}/${files}_$report_file
+
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Today = $today"
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Previous = $previous"
+          optout_file_checks $today $previous $files
+        else
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Skipping $files checks"
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Skipping $files checks" >> ${working}/${files}_$report_file
+        fi
+        # If we have an error file there's no point sending the files to Cadent
+        if [ -f ${working}/${files}_$error_file ]
+        then
+          archive_files $files $outbox $failed
+        else
+          # Upload the files to Cadent
+          if [[ $upload_to_cadent == 1 ]]
+          then
+            upload_files_to_cadent $prefix $files
+          fi
         fi
       fi
-
     fi
-
+  else
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Lock file found, exiting"
   fi
 
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Processing of $files files complete"
@@ -144,71 +138,69 @@ then
     
   lock_status=$(check_for_lock $files)
   
-  if [[ $lock_status == '1' ]]
+  if [[ $lock_status != '1' ]]
   then
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - Lock file found, exiting"
-    continue
-  fi
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - No lock file found, continuing"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - No lock file found, continuing"
+    create_lock_file $files
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" > ${working}/${files}_$report_file
 
-  create_lock_file $files
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" > ${working}/${files}_$report_file
+    if [[ $files == Experian ]]
+    then
 
-  if [[ $files == Experian ]]
-  then
+      prepare_outbox $prefix $files
+      check_inbox $inbox $prefix $files
 
-    prepare_outbox $prefix $files
-    check_inbox $inbox $prefix $files 
-
-    if [[ $failure_status != 1 ]]
-    then 
-
-      # Processing the files should be the last thing we do because this takes time.
-      # Here we remove the trialist data and change to the correct format (if that was necessary)
-      if [[ $process_files == 1 ]]
+      if [[ $failure_status != 1 ]]
       then
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Starting processing of $files files"
-        process_files $prefix
-      fi
 
-      previous=$(ls -ltr ${sent}/Audience_DLAR*_1.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f3)
-      if [[ $previous != "" ]] && [[ $experian_checks == 1 ]]
-      then
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files" >> ${working}/${files}_$report_file
-        
-        # AdOps don't need all these checks but there here for completeness. Check the experian_file_checks file to see what we're running.
-        if [[ $experian_file_checks == 1 ]]
+        # Processing the files should be the last thing we do because this takes time.
+        # Here we remove the trialist data and change to the correct format (if that was necessary)
+        if [[ $process_files == 1 ]]
         then
-          experian_file_checks $today $previous
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Starting processing of $files files"
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Starting processing of $files files" >> ${working}/${files}_$report_file
+          process_files $prefix
         fi
 
-        # These data checks take a long time to run but they're crucial for maintaining a good relationship with Sky
-        if [[ $experian_data_checks == 1 ]]
+        previous=$(ls -ltr ${sent}/Audience_DLAR*_1.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f3)
+        if [[ $previous != "" ]] && [[ $experian_checks == 1 ]]
         then
-          experian_data_checks $today $previous
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files"
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files" >> ${working}/${files}_$report_file
+
+          # AdOps don't need all these checks but there here for completeness. Check the experian_file_checks file to see what we're running.
+          if [[ $experian_file_checks == 1 ]]
+          then
+            experian_file_checks $today $previous
+          fi
+
+          # These data checks take a long time to run but they're crucial for maintaining a good relationship with Sky
+          if [[ $experian_data_checks == 1 ]]
+          then
+            experian_data_checks $today $previous
+          fi
+
+        else
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Skipping $files checks"
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Skipping $files checks" >> ${working}/${files}_$report_file
         fi
 
-      else
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Skipping $files checks"
-        echo "$(date "+%Y-%m-%d %H:%M:%S") - Skipping $files checks" >> ${working}/${files}_$report_file
-      fi
-
-      # If we have an error file there's no point sending the files to Cadent
-      if [ -f ${working}/${files}_$error_file ]
-      then
-        archive_files $files $outbox $failed
-      else
-        # Upload the files to Cadent
-        if [[ $upload_to_cadent == 1 ]]
+        # If we have an error file there's no point sending the files to Cadent
+        if [ -f ${working}/${files}_$error_file ]
         then
-          upload_files_to_cadent $prefix $files
+          archive_files $files $outbox $failed
+        else
+          # Upload the files to Cadent
+          if [[ $upload_to_cadent == 1 ]]
+          then
+            upload_files_to_cadent $prefix $files
+          fi
         fi
       fi
-
     fi
-
+  else
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Lock file found, exiting"
   fi
 
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Processing of $files files complete"
