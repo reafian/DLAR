@@ -26,7 +26,7 @@ function check_for_lock {
 
 # Create a lock file to stop multiple instances of the program running
 function create_lock_file {
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Creating lock file"
+#  echo "$(date "+%Y-%m-%d %H:%M:%S") - Creating lock file"
   if [ ! -f ${working}/${1}_$lock_file ]
   then
     touch ${working}/${1}_${lock_file}
@@ -35,7 +35,7 @@ function create_lock_file {
 
 # Remove the lock file
 function remove_lock_file {
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing lock file"
+#  echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing lock file"
   rm -f ${working}/${1}_${lock_file}
 }
 
@@ -92,7 +92,7 @@ function check_inbox {
   # Move the delivered files to the working directory if the .done file exists
   failure_status=0
   cd $1
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking inbox"
+#  echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking inbox"
   if [[ $(ls | wc -l | awk '{print $1}') > 0 ]]
   then
     echo "$(date "+%Y-%m-%d %H:%M:%S") - $3 files found, looking for 'done' file"
@@ -138,7 +138,7 @@ function check_inbox {
       failure_status=1
     fi
   else
-    echo "$(date "+%Y-%m-%d %H:%M:%S") - No files found"
+#    echo "$(date "+%Y-%m-%d %H:%M:%S") - No files found"
     failure_status=1
   fi
 }
@@ -156,6 +156,7 @@ function create_delete {
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Creating box list for $previous_filedate" >> ${working}/${files}_$report_file
   cat ${sent}/Audience_DLAR_${previous_filedate}*.csv | grep -v DEVICE | cut -d, -f2 | sort >> $working/${previous_filedate}.txt
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Creating diff file"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - Creating diff file" >> ${working}/${files}_$report_file
   diff -y ${working}/${current_filedate}.txt ${working}/${previous_filedate}.txt  | grep '>' | awk '{print $2}' >> $working/DLAR_${current_filedate}_delete.txt
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Delete list contains $(wc -l ${working}/DLAR_${current_filedate}_delete.txt | awk '{print $1}') records"
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Delete list contains $(wc -l ${working}/DLAR_${current_filedate}_delete.txt | awk '{print $1}') records" >> ${working}/${files}_$report_file
@@ -219,7 +220,7 @@ function process_files {
 }
 
 function get_sftp_size {
-  sftp -q $cadent_user@$cadent_server << EOF
+  sftp -oConnectTimeout=10 $cadent_user@$cadent_server << EOF
   cd waiting
   ls -l $1
 EOF
@@ -242,7 +243,7 @@ function sftp_check {
 }
 
 function do_sftp {
-  sftp -q $cadent_user@$cadent_server << EOF
+  sftp -oConnectTimeout=10 $cadent_user@$cadent_server << EOF
   cd waiting
   put -p $1 ${base}.tmp
   rename ${base}.tmp ${base}.csv
@@ -252,7 +253,7 @@ EOF
 function upload_to_cadent {
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Changing permissions on $1"
   chmod 666 $1
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - sftp -q $1 $cadent_user@${cadent_server}:${waiting}"
+  echo "$(date "+%Y-%m-%d %H:%M:%S") - sftp $1 $cadent_user@${cadent_server}:${waiting}"
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading $1"
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Uploading $1" >> ${working}/${files}_$report_file
   base=$(basename $1 .csv)
@@ -262,7 +263,7 @@ function upload_to_cadent {
 
 function remove_uploaded_files {
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Removing uploaded file $1"
-    sftp -q $cadent_user@$cadent_server << EOF
+    sftp -oConnectTimeout=10 $cadent_user@$cadent_server << EOF
     cd waiting
     rm ${1}*.csv
 EOF
@@ -365,6 +366,24 @@ function rename_reports {
     cp ${working}/${files}_$file_report_csv ${working}/${files}_file_report_${today}.csv
     mv ${working}/${files}_$file_report_csv ${reports}/${files}_file_report_${today}.csv
   fi
+
+  if [ -f ${working}/${files}_$attr_data_report_csv ]
+  then
+    cp ${working}/${files}_$attr_data_report_csv ${working}/${files}_attribute_data_report_${today}.csv
+    mv ${working}/${files}_$attr_data_report_csv ${reports}/${files}_attribute_data_report_${today}.csv
+  fi
+
+  if [ -f ${working}/${files}_$attr_report_csv ]
+  then
+    cp ${working}/${files}_$attr_report_csv ${working}/${files}_attribute_data_report_${today}.csv
+    mv ${working}/${files}_$attr_report_csv ${reports}/${files}_attribute_data_report_${today}.csv
+  fi
+
+  if [ -f ${working}/${files}_$record_counts_csv ]
+  then
+    cp ${working}/${files}_$record_counts_csv ${working}/${files}_record_counts_${today}.csv
+    mv ${working}/${files}_$record_counts_csv ${reports}/${files}_record_counts_${today}.csv
+  fi
 }
 
 # Turn the date into a more readable format
@@ -392,7 +411,7 @@ function send_mail {
 Please find attached today's $1 report.
 
 Richard"
-  #echo "$message" | mailx -a "$3" -s "$1 Delivery Report - $2" -r $reply_to $send_to
+  echo "$message" | mailx -a "$3" -s "$1 Delivery Report - $2" -r $reply_to $send_to
 }
 
 # Mail message routine
@@ -470,7 +489,7 @@ function do_we_need_to_worry_optout {
 }
 
 function tidy_up {
-  echo "$(date "+%Y-%m-%d %H:%M:%S") - Deleting old working $1 files"
+#  echo "$(date "+%Y-%m-%d %H:%M:%S") - Deleting old working $1 files"
   rm -f $working/${1}*
   rm -f $outbox/${2}*
 }

@@ -53,10 +53,10 @@ then
 
   # Reports
   report_file=report.tmp
-  experian_record_counts_csv=record_count_report
   file_report_csv=file_report
-  experian_attr_report_csv=attribute_count_report
-  experian_attr_data_report_csv=attribute_data_count_report
+  record_counts_csv=record_count_report
+  attr_report_csv=attribute_count_report
+  attr_data_report_csv=attribute_data_count_report
   error_file=error.tmp
   experian_zip=reports_${today}.zip
 else
@@ -92,10 +92,10 @@ else
 
   # Reports
   report_file=report.tmp
-  experian_record_counts_csv=record_count_report
   file_report_csv=file_report
-  experian_attr_report_csv=attribute_count_report
-  experian_attr_data_report_csv=attribute_data_count_report
+  record_counts_csv=record_count_report
+  attr_report_csv=attribute_count_report
+  attr_data_report_csv=attribute_data_count_report
   error_file=error.tmp
   experian_zip=reports_${today}.zip
 
