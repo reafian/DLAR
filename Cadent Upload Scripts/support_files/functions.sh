@@ -375,8 +375,8 @@ function rename_reports {
 
   if [ -f ${working}/${files}_$attr_report_csv ]
   then
-    cp ${working}/${files}_$attr_report_csv ${working}/${files}_attribute_data_report_${today}.csv
-    mv ${working}/${files}_$attr_report_csv ${reports}/${files}_attribute_data_report_${today}.csv
+    cp ${working}/${files}_$attr_report_csv ${working}/${files}_attribute_report_${today}.csv
+    mv ${working}/${files}_$attr_report_csv ${reports}/${files}_attribute_report_${today}.csv
   fi
 
   if [ -f ${working}/${files}_$record_counts_csv ]

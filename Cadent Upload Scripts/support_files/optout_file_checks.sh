@@ -70,7 +70,7 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $eos_optedin_first_date $eos_optedin_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "EOS Opted In","$eos_optedin_first_date","$eos_optedin_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
+  echo "Horizon Opted In","$eos_optedin_first_date","$eos_optedin_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
@@ -88,7 +88,7 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $eos_optedout_first_date $eos_optedout_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "EOS Opted Out","$eos_optedout_first_date","$eos_optedout_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
+  echo "Horizon Opted Out","$eos_optedout_first_date","$eos_optedout_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
@@ -106,7 +106,7 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $apls_optedin_first_date $apls_optedin_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "APLS Opted In","$apls_optedin_first_date","$apls_optedin_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
+  echo "TV2.0 Opted In","$apls_optedin_first_date","$apls_optedin_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]
@@ -124,7 +124,7 @@ function get_optout_file_record_counts {
 
   percentage_change=$(check_percentage_change_in_files $apls_optedout_first_date $apls_optedout_second_date)
   percentage_change_whole_number=$(echo $percentage_change | cut -d. -f1 | tr -d '-')
-  echo "APLS Opted Out","$apls_optedout_first_date","$apls_optedout_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
+  echo "TV2.0 Opted Out","$apls_optedout_first_date","$apls_optedout_second_date","$percentage_change" >> ${working}/${files}_$file_report_csv
   worried=$(do_we_need_to_worry_optout $percentage_change_whole_number)
 
   if [[ $worried == 1 ]]

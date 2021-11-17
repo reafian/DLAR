@@ -18,7 +18,7 @@ fi
 
 # Use these flags to enable or disable the components needed.
 
-optout=0
+optout=1
 experian=1
 optout_checks=1
 process_files=1
@@ -26,8 +26,8 @@ create_delete=1
 experian_checks=1
 experian_file_checks=1
 experian_data_checks=1
-upload_to_cadent=0
-send_mail=0
+upload_to_cadent=1
+send_mail=1
 
 source $source_path/variables.sh
 source $source_path/functions.sh
