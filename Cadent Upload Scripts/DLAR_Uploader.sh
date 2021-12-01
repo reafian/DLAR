@@ -23,7 +23,7 @@ experian=1
 optout_checks=1
 process_files=1
 create_delete=1
-experian_checks=1
+experian_checks=0
 experian_file_checks=1
 experian_data_checks=1
 upload_to_cadent=1
@@ -76,7 +76,7 @@ then
         echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files"
         echo "$(date "+%Y-%m-%d %H:%M:%S") - Working on the $files files" > ${working}/${files}_$report_file
 
-        previous=$(ls -ltr ${sent}/Advt*.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f4 | cut -c1-8)
+        previous=$(ls -ltr ${archive}/Advt*.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f4 | cut -c1-8)
         if [[ $previous != "" ]] && [[ $optout_checks == 1 ]]
         then
           echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files"
@@ -92,7 +92,7 @@ then
         # If we have an error file there's no point sending the files to Cadent
         if [ -f ${working}/${files}_$error_file ]
         then
-          archive_files $files $outbox $failed
+          archive_files $prefix $outbox $failed
         else
           # Upload the files to Cadent
           if [[ $upload_to_cadent == 1 ]]
@@ -165,7 +165,7 @@ then
           process_files $prefix
         fi
 
-        previous=$(ls -ltr ${sent}/Audience_DLAR*_1.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f3)
+        previous=$(ls -ltr ${archive}/Audience_DLAR*_1.csv 2> /dev/null | grep -v $today | tail -1 | awk '{print $9}' | cut -d_ -f3)
         if [[ $previous != "" ]] && [[ $experian_checks == 1 ]]
         then
           echo "$(date "+%Y-%m-%d %H:%M:%S") - Checking delivered $files files"
@@ -195,7 +195,11 @@ then
         # If we have an error file there's no point sending the files to Cadent
         if [ -f ${working}/${files}_$error_file ]
         then
-          archive_files $files $outbox $failed
+          echo "$(date "+%Y-%m-%d %H:%M:%S") - Houston, We have a problem."
+echo $outbox
+ls $outbox
+          echo archive_files $prefix $outbox $failed
+          archive_files $prefix $outbox $failed
         else
           # Upload the files to Cadent
           if [[ $upload_to_cadent == 1 ]]

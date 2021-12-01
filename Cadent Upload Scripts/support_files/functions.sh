@@ -70,8 +70,8 @@ function archive_files {
     then
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Archiving $1 files"
       filedate=$(head -1 ${2}/AUDIENCE_FILES.txt | cut -d_ -f3)
-      mv -f AUDIENCE_FILES.txt ${3}/AUDIENCE_FILES_${filedate}.txt
-      mv -f Audience* $3
+      mv -f ${2}/AUDIENCE_FILES.txt ${3}/AUDIENCE_FILES_${filedate}.txt
+      mv -f ${2}/Audience* $3
     fi
   elif [[ $1 == "Advt" ]]
   then
@@ -79,8 +79,8 @@ function archive_files {
     then
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Archiving $1 files"
       filedate=$(head -1 ${2}/Advt_optout_devices.txt | cut -d_ -f4 | cut -c1-8)
-      mv -n Advt_optout_devices.txt ${3}/Advt_optout_devices_${filedate}.txt
-      mv -f Advt* $3
+      mv -n ${2}/Advt_optout_devices.txt ${3}/Advt_optout_devices_${filedate}.txt
+      mv -f ${2}/Advt* $3
     fi
   fi
 }
@@ -197,8 +197,22 @@ function remove_trial_data {
   fi
 }
 
+# Geobox fix to change G%5F1 and G%5F2 to G_1 and G_2
+function geobox_fix {
+  file=$1
+  if [[ $2 == "Audience" ]]
+  then
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Searching for Geobox headers"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Adjusting Geobox header in Experian file $file"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") - Adjusting Geobox header in Experian file $file" >> ${working}/${files}_$report_file
+    cat ${outbox}/$file | sed '0,/G%5F1/{s//G_1/}' | sed '0,/G%5F2/{s//G_2/}' > ${outbox}/adjusted.tmp
+    mv ${outbox}/adjusted.tmp ${outbox}/${file}
+  fi
+}
+
 # This is where we change the data in the files to remove boxes and the rest
 function process_files {
+  # $1 = Audience / Advt
   donefile=$(ls ${outbox}/${1}*.done | tail -1 2>/dev/null)
   basefile=$(basename $donefile .done)
   echo "$(date "+%Y-%m-%d %H:%M:%S") - Processing ${basefile}.txt"
@@ -215,6 +229,7 @@ function process_files {
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Editing $file to remove to trailist data"
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Editing $file to remove to trailist data" >> ${working}/${files}_$report_file
       remove_trial_data $file $1
+      geobox_fix $file $1
     done < ${outbox}/${basefile}.txt
   fi
 }
@@ -416,7 +431,7 @@ Richard"
 
 # Mail message routine
 function send_message {
-  rename_reports $1
+#  rename_reports $1
   if [ -f ${working}/${files}_*error* ]
   then
     zipfile=$(zip_files $1 failure)
