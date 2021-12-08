@@ -10,15 +10,16 @@
 
 # Get a count of records in each file
 function get_eos_record_count {
-  if [ -f ${archive}/Advt_optout_devices_${1}*.csv ]
+  file=$(ls ${archive}/Advt_optout_devices_${1}*.csv 2>/dev/null | tail -1)
+  if [ -f $file ]
   then
     if [[ $3 == "optedin" ]]
     then
-      count=$(grep $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"0"')
+      count=$(grep $2 $file | grep -c ',"0"')
       echo $count
     elif [[ $3 == "optedout" ]]
     then
-      count=$(grep $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"1"')
+      count=$(grep $2 $file | grep -c ',"1"')
       echo $count
     fi
   else
@@ -28,15 +29,16 @@ function get_eos_record_count {
 
 # Get a count of records in each file
 function get_apls_record_count {
-  if [ -f ${archive}/Advt_optout_devices_${1}*.csv ]
+  file=$(ls ${archive}/Advt_optout_devices_${1}*.csv 2>/dev/null | tail -1)
+  if [ -f $file ]
   then
     if [[ $3 == "optedin" ]]
     then
-      count=$(grep $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"0"')
+      count=$(grep $2 $file | grep -c ',"0"')
       echo $count
     elif [[ $3 == "optedout" ]]
     then
-      count=$(grep $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"1"')
+      count=$(grep $2 $file | grep -c ',"1"')
       echo $count
     fi
   else
@@ -46,15 +48,16 @@ function get_apls_record_count {
 
 # TiVo is basically not EOS
 function get_tivo_record_count {
-  if [ -f ${archive}/Advt_optout_devices_${1}*.csv ]
+  file=$(ls ${archive}/Advt_optout_devices_${1}*.csv 2>/dev/null | tail -1)
+  if [ -f $file ]
   then
     if [[ $3 == "optedin" ]]
     then
-      count=$(egrep -v $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"0"')
+      count=$(egrep -v $2 $file | grep -c ',"0"')
       echo $count
     elif [[ $3 == "optedout" ]]
     then
-      count=$(egrep -v $2 ${archive}/Advt_optout_devices_${1}*.csv | grep -c ',"1"')
+      count=$(egrep -v $2 $file | grep -c ',"1"')
       echo $count
     fi
   else

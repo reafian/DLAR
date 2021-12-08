@@ -23,7 +23,7 @@ experian=1
 optout_checks=1
 process_files=1
 create_delete=1
-experian_checks=0
+experian_checks=1
 experian_file_checks=1
 experian_data_checks=1
 upload_to_cadent=1
@@ -196,9 +196,6 @@ then
         if [ -f ${working}/${files}_$error_file ]
         then
           echo "$(date "+%Y-%m-%d %H:%M:%S") - Houston, We have a problem."
-echo $outbox
-ls $outbox
-          echo archive_files $prefix $outbox $failed
           archive_files $prefix $outbox $failed
         else
           # Upload the files to Cadent

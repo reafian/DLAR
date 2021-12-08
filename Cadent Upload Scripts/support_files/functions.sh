@@ -79,7 +79,7 @@ function archive_files {
     then
       echo "$(date "+%Y-%m-%d %H:%M:%S") - Archiving $1 files"
       filedate=$(head -1 ${2}/Advt_optout_devices.txt | cut -d_ -f4 | cut -c1-8)
-      mv -n ${2}/Advt_optout_devices.txt ${3}/Advt_optout_devices_${filedate}.txt
+      mv -n ${2}/Advt_optout_devices.txt ${3}/Advt_optout_devices_${filedate}_$(date +"%H%m%S").txt
       mv -f ${2}/Advt* $3
     fi
   fi
